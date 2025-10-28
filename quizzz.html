@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Quiz Akuntansi by Jita 💖</title>
+<style>
+  :root{
+    --bg:#fff0f6;
+    --card:#fff6fb;
+    --accent:#ff7ab6;
+    --accent-2:#ffd6e8;
+    --muted:#d59edf;
+    --soft:#ffd9ee;
+    --glass: rgb(231, 120, 205);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(1200px 600px at 10% 10%, #fff0f6 0%, transparent 20%),
+                radial-gradient(900px 400px at 90% 90%, #fff8f3 0%, transparent 20%),
+                var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+    color:#4b684f;
+  }
+
+  .stage{
+    width:100%;
+    max-width:920px;
+    background: linear-gradient(180deg, var(--card), #fff);
+    border-radius:18px;
+    padding:26px;
+    box-shadow: 0 8px 30px rgba(153,62,112,0.12);
+    position:relative;
+    overflow:visible;
+  }
+
+  /* header cute */
+  .header{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .logo{
+    width:72px; height:72px; border-radius:14px;
+    background: conic-gradient(from 220deg, #ffe0f0, #ffd8f4, #ffd0ee);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 18px rgba(255,122,182,0.12);
+    font-size:34px;
+  }
+  .title{
+    flex:1;
+  }
+  .title h1{ margin:0; font-size:20px; color:#5a2840; }
+  .title p{ margin:2px 0 0; color:var(--muted); font-size:13px; }
+
+  /* card area */
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.7), var(--glass));
+    border-radius:12px;
+    padding:20px;
+    display:grid;
+    grid-template-columns: 1fr 280px;
+    gap:18px;
+    align-items:start;
+  }
+
+  /* main quiz */
+  .main{
+    min-height:340px;
+  }
+
+  .question-box{
+    background: linear-gradient(180deg, #fff, #fff9fb);
+    border-radius:12px;
+    padding:18px;
+    border: 1px solid rgba(255,122,182,0.12);
+    box-shadow: 0 10px 30px rgba(255,122,182,0.06);
+    position:relative;
+    overflow:hidden;
+  }
+  .question-num{
+    font-weight:600;
+    color:var(--accent);
+    font-size:13px;
+    margin-bottom:8px;
+  }
+  .question-text{
+    font-size:18px;
+    margin:6px 0 14px;
+    display:flex; gap:8px; align-items:center;
+  }
+  .question-text .cute-emoji{
+    font-size:26px;
+    transform:translateY(2px);
+    animation: floaty 3s ease-in-out infinite;
+  }
+  @keyframes floaty{
+    0%{ transform:translateY(0) }
+    50%{ transform:translateY(-8px) }
+    100%{ transform:translateY(0) }
+  }
+
+  .answers{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option{
+    border-radius:12px;
+    padding:12px 14px;
+    cursor:pointer;
+    border:1px solid rgba(136,82,111,0.06);
+    background: linear-gradient(180deg, #fff, #fff6fb);
+    transition: transform .14s ease, box-shadow .14s ease, background .14s;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-weight:600;
+  }
+  .option:hover{ transform:translateY(-4px); box-shadow: 0 8px 20px rgba(255,122,182,0.08); }
+  .option.selected{ background: linear-gradient(90deg, #fff0f8, #ffe6f4); border:1px solid var(--accent); }
+
+  /* right sidebar */
+  .side{
+    background: linear-gradient(180deg,#fff, #fff7fb);
+    border-radius:12px; padding:14px;
+    height:100%;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .progress{
+    height:12px; background: #ffeef6; border-radius:10px; overflow:hidden;
+  }
+  .progress > i{ display:block; height:100%; background: linear-gradient(90deg,#ffb0d6, #ff78b6); width:0%; transition:width .5s cubic-bezier(.2,.9,.3,1); }
+
+  .meta{ font-size:13px; color:var(--muted); margin-top:6px; }
+
+  .controls{ margin-top:auto; display:flex; gap:8px; }
+  .btn{
+    padding:10px 12px; border-radius:12px; border:none; cursor:pointer; font-weight:700;
+    background: linear-gradient(180deg,var(--accent), #ff4d8d); color:white;
+    box-shadow: 0 8px 18px rgba(255,122,182,0.12);
+  }
+  .btn.ghost{
+    background:transparent; color:var(--accent); border:1px dashed rgba(255,122,182,0.14);
+    box-shadow:none; font-weight:600;
+  }
+
+  /* feedback / score */
+  .feedback{
+    margin-top:14px; text-align:center; padding:12px; border-radius:12px;
+    background: linear-gradient(180deg, #fff5fb, #fffafc);
+    border:1px solid rgba(255,122,182,0.06);
+    display:none;
+  }
+  .feedback.show{ display:block; animation: pop .35s ease; }
+  @keyframes pop{ from{ transform:scale(.96); opacity:0 } to{ transform:scale(1); opacity:1 } }
+
+  /* hearts + confetti */
+  .hearts { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:8; }
+  .heart{
+    position:absolute; width:28px; height:28px; transform-origin:center; opacity:0;
+    font-size:20px; display:flex; align-items:center; justify-content:center;
+    animation: heart-fly 2200ms linear forwards;
+    filter: drop-shadow(0 6px 18px rgba(255,80,140,0.12));
+  }
+  @keyframes heart-fly{
+    0%{ transform:translateY(0) scale(.6); opacity:0}
+    10%{ opacity:1; transform:translateY(-10px) scale(1)}
+    60%{ opacity:1 }
+    100%{ transform:translateY(-220px) scale(.8); opacity:0}
+  }
+
+  /* responsive */
+  @media (max-width:880px){
+    .card{ grid-template-columns: 1fr; }
+    .logo{ width:64px; height:64px }
+    .title h1{ font-size:18px }
+  }
+
+  /* tiny cute footer */
+  .footer{
+    font-size:12px; color:var(--muted); margin-top:12px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .sparkle{ font-size:18px; animation: twink 2s linear infinite; }
+  @keyframes twink{ 0%,100%{opacity:.7} 50%{opacity:1} }
+</style>
+</head>
+<body>
+<div class="stage" role="application" aria-label="Quiz Akuntansi">
+  <div class="hearts" id="hearts"></div>
+
+  <div class="header">
+    <div class="logo">💟</div>
+    <div class="title">
+      <h1>Quiz Akuntansi by Jita 💕</h1>
+      <p>Campuran pilihan ganda & benar/salah — enjoy kids mhewehehe</p>
+    </div>
+    <div style="text-align:right">
+      <div style="font-weight:700;color:#b44a78;">Skor: <span id="scoreMini">0</span></div>
+      <div style="font-size:12px;color:var(--muted)">Pertanyaan: <span id="qMini">0/0</span></div>
+    </div>
+  </div>
+
+  <div class="card" aria-live="polite">
+    <div class="main">
+      <div class="question-box" id="qbox">
+        <div class="question-num" id="qnum">Pertanyaan 1</div>
+        <div class="question-text"><span class="cute-emoji" id="qemoji">📘</span><div id="qtext">Memuat pertanyaan...</div></div>
+
+        <div class="answers" id="answers">
+          <!-- opsi akan di-generate -->
+        </div>
+
+        <div class="feedback" id="feedback">
+          <div id="fbText">Mantul!</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:12px; align-items:center;">
+        <button class="btn ghost" id="prevBtn">‹ Sebelumnya</button>
+        <button class="btn ghost" id="nextBtn">Selanjutnya ›</button>
+        <div style="flex:1"></div>
+        <button class="btn" id="submitBtn">Selesai & Nilai</button>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div>
+        <strong>Progress</strong>
+        <div class="progress" aria-hidden="true" style="margin-top:8px"><i id="progressBar"></i></div>
+        <div class="meta">Jawab dengan jujur, ada penjelasan singkat di akhir 💗</div>
+      </div>
+
+      <div style="margin-top:8px">
+        <strong>Petunjuk</strong>
+        <p class="meta" style="margin:6px 0 0">Pilih jawaban, gunakan tombol Next/Prev. Suara dan animasi bikin hati meletus tiap jawaban bener ✨</p>
+      </div>
+
+      <div class="controls">
+        <button class="btn ghost" id="resetBtn">Ulangi</button>
+        <button class="btn" id="heartBtn">Beri Hati 💖</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">
+    <div>Made with <span class="sparkle">✨</span> & lots of pink</div>
+    <div style="font-weight:700;color:#b44a78">Good luck! 🍬</div>
+  </div>
+</div>
+
+<script>
+/* ====== Data kuis (campuran) ======
+   type: "mcq" => multiple choice
+         "tf"  => true/false
+   setiap pertanyaan ada explanation
+*/
+const QUIZ = [
+  { type:"mcq", q:"Dalam akuntansi, akun 'Kas' termasuk dalam kelompok...", 
+    opts:["Aset Lancar","Kewajiban","Pendapatan","Beban"],
+    ans:0,
+    explain:"Kas adalah sumber daya ekonomi yang dimiliki perusahaan, sehingga termasuk aset (current asset)."
+  },
+  { type:"tf", q:"Akrual (accrual) berarti pendapatan/beban dicatat saat terjadi, bukan saat kas diterima/dibayar.",
+    ans:true,
+    explain:"Benar — prinsip akrual mencatat saat transaksi terjadinya, bukan kas masuk/keluar."
+  },
+  { type:"mcq", q:"Persamaan dasar akuntansi adalah...",
+    opts:["Aset = Liabilitas + Ekuitas","Aset + Liabilitas = Ekuitas","Pendapatan = Beban","Ekuitas = Aset - Beban"],
+    ans:0,
+    explain:"Aset = Liabilitas + Ekuitas — formula fundamental neraca."
+  },
+  { type:"tf", q:"Depresiasi meningkatkan nilai buku aset tetap seiring waktu.",
+    ans:false,
+    explain:"Salah — depresiasi justru mengurangi nilai buku aset tetap tiap periode."
+  },
+  { type:"mcq", q:"Manakah yang termasuk contoh beban operasional?",
+    opts:["Gaji karyawan","Penjualan saham","Pembelian tanah","Penerimaan dividen"],
+    ans:0,
+    explain:"Gaji merupakan biaya operasional perusahaan; pilihan lain bukan beban operasional."
+  },
+  { type:"mcq", q:"Jika perusahaan menerima pembayaran di muka dari pelanggan, akun apa yang bertambah?",
+    opts:["Pendapatan","Beban Dibayar Dimuka","Utang/Pendapatan Diterima Dimuka","Aset Tetap"],
+    ans:2,
+    explain:"Pembayaran di muka dicatat sebagai kewajiban (pendapatan diterima di muka) sampai jasa/produk diberikan."
+  }
+];
+
+/* ====== UI refs ====== */
+const qnumEl = document.getElementById('qnum');
+const qtextEl = document.getElementById('qtext');
+const qemojiEl = document.getElementById('qemoji');
+const answersEl = document.getElementById('answers');
+const progressBar = document.getElementById('progressBar');
+const fb = document.getElementById('feedback');
+const fbText = document.getElementById('fbText');
+const scoreMini = document.getElementById('scoreMini');
+const qMini = document.getElementById('qMini');
+
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const submitBtn = document.getElementById('submitBtn');
+const resetBtn = document.getElementById('resetBtn');
+const heartBtn = document.getElementById('heartBtn');
+const heartsContainer = document.getElementById('hearts');
+
+let current = 0;
+let answers = Array(QUIZ.length).fill(null);
+let score = 0;
+
+/* set initial UI */
+function init(){
+  current = 0;
+  answers.fill(null);
+  score = 0;
+  scoreMini.textContent = "0";
+  qMini.textContent = `0/${QUIZ.length}`;
+  renderQuestion();
+  updateProgress();
+}
+init();
+
+/* render question based on type */
+function renderQuestion(){
+  const item = QUIZ[current];
+  qnumEl.textContent = `Pertanyaan ${current+1} / ${QUIZ.length}`;
+  qtextEl.textContent = item.q;
+  qemojiEl.textContent = pickEmoji(item.type);
+  answersEl.innerHTML = '';
+
+  if(item.type === 'mcq'){
+    item.opts.forEach((opt, idx)=>{
+      const div = document.createElement('div');
+      div.className = 'option';
+      div.setAttribute('data-idx', idx);
+      div.innerHTML = `<span>${String.fromCharCode(65+idx)}. ${opt}</span><span>➤</span>`;
+      if(answers[current] === idx) div.classList.add('selected');
+      div.addEventListener('click', ()=> chooseMCQ(div, idx));
+      answersEl.appendChild(div);
+    });
+  } else if(item.type === 'tf'){
+    ['Benar','Salah'].forEach((t, i)=>{
+      const val = (i===0);
+      const div = document.createElement('div');
+      div.className = 'option';
+      div.innerHTML = `<span>${t}</span><span>➤</span>`;
+      if(answers[current] === val) div.classList.add('selected');
+      div.addEventListener('click', ()=> chooseTF(div, val));
+      answersEl.appendChild(div);
+    });
+  }
+
+  // update mini
+  qMini.textContent = `${answers.filter(a=>a!==null).length}/${QUIZ.length}`;
+}
+
+/* helpers for choosing */
+function chooseMCQ(el, idx){
+  // deselect siblings
+  [...answersEl.children].forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[current] = idx;
+  playClick();
+  showTinyHeartBurst(6);
+  qMini.textContent = `${answers.filter(a=>a!==null).length}/${QUIZ.length}`;
+}
+
+function chooseTF(el, val){
+  [...answersEl.children].forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[current] = val;
+  playClick();
+  showTinyHeartBurst(5);
+  qMini.textContent = `${answers.filter(a=>a!==null).length}/${QUIZ.length}`;
+}
+
+/* navigation */
+prevBtn.addEventListener('click', ()=>{
+  if(current>0){ current--; renderQuestion(); updateProgress(); playClick(); }
+});
+nextBtn.addEventListener('click', ()=>{
+  if(current < QUIZ.length-1){ current++; renderQuestion(); updateProgress(); playClick(); }
+});
+resetBtn.addEventListener('click', ()=>{
+  if(confirm('Mulai ulang kuis dari awal?')){ init(); playClick(); }
+});
+heartBtn.addEventListener('click', ()=>{ showTinyHeartBurst(12); playScale(); });
+
+/* submit and scoring */
+submitBtn.addEventListener('click', ()=>{
+  // check unanswered
+  if(answers.some(a=>a===null)){
+    if(!confirm('Masih ada pertanyaan belum terjawab. Tetap lanjutkan?')) return;
+  }
+  // calculate score
+  score = 0;
+  QUIZ.forEach((it,i)=>{
+    if(it.type==='mcq' && answers[i] === it.ans) score++;
+    if(it.type==='tf' && answers[i] === it.ans) score++;
+  });
+
+  scoreMini.textContent = score + " / " + QUIZ.length;
+  // show feedback and explanations
+  showResults();
+  playSuccess();
+  showBigHeartBurst(28);
+});
+
+/* results modal-like (in feedback area) */
+function showResults(){
+  fb.classList.add('show');
+  let text = `<div style="font-weight:800; color:#b02f6b; font-size:16px">Hasil: ${score} dari ${QUIZ.length}</div>`;
+  text += `<div style="margin-top:8px; font-size:13px; color:var(--muted)">Penjelasan singkat:</div><ul style="text-align:left; margin:8px 0 0; padding-left:18px; color:#5a3a47">`;
+  QUIZ.forEach((it,i)=>{
+    const your = (answers[i]===null ? 'Belum' : (it.type==='mcq' ? it.opts[it.ans] : (it.ans ? 'Benar' : 'Salah')));
+    const correct = (it.type==='mcq' ? it.opts[it.ans] : (it.ans ? 'Benar' : 'Salah'));
+    const mark = ((it.type==='mcq' && answers[i]===it.ans) || (it.type==='tf' && answers[i]===it.ans)) ? '✅' : '❌';
+    text += `<li style="margin:8px 0">${mark} Q${i+1} — <strong>${correct}</strong><div style="font-size:12px;color:var(--muted);margin-top:6px">${it.explain}</div></li>`;
+  });
+  text += `</ul>`;
+  fbText.innerHTML = text;
+  // scroll to feedback
+  fb.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* progress bar */
+function updateProgress(){
+  const pct = Math.round((current+1)/QUIZ.length * 100);
+  progressBar.style.width = pct + '%';
+}
+
+/* pick emoji */
+function pickEmoji(type){
+  if(type==='mcq') return ['📘','📚','📝'][Math.floor(Math.random()*3)];
+  if(type==='tf') return ['🤔','💡'][Math.floor(Math.random()*2)];
+  return '💖';
+}
+
+/* ====== Cute hearts animation functions ====== */
+function showTinyHeartBurst(count=6){
+  for(let i=0;i<count;i++){
+    const h = document.createElement('div');
+    h.className='heart';
+    h.style.left = (40 + Math.random()*80) + '%';
+    h.style.top = (60 + Math.random()*20) + '%';
+    h.style.fontSize = (12 + Math.random()*14) + 'px';
+    h.textContent = ['💗','💖','💕','💞'][Math.floor(Math.random()*4)];
+    heartsContainer.appendChild(h);
+    // auto remove
+    setTimeout(()=> { h.remove(); }, 2400 + Math.random()*800);
+  }
+}
+function showBigHeartBurst(count=20){
+  for(let i=0;i<count;i++){
+    const h = document.createElement('div');
+    h.className='heart';
+    h.style.left = (10 + Math.random()*80) + '%';
+    h.style.top = (50 + Math.random()*30) + '%';
+    h.style.fontSize = (18 + Math.random()*36) + 'px';
+    h.style.animationDuration = (1600 + Math.random()*1200)+'ms';
+    h.textContent = ['💗','💖','💕','💞','💝'][Math.floor(Math.random()*5)];
+    heartsContainer.appendChild(h);
+    setTimeout(()=> { h.remove(); }, 2400 + Math.random()*1200);
+  }
+}
+
+/* tiny scale pulse sound (WebAudio) */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+function playClick(){
+  try{
+    if(!audioCtx) audioCtx = new AudioCtx();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 700 + Math.random()*200;
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    o.stop(audioCtx.currentTime + 0.16);
+  }catch(e){ /* autoplay restrictions may block until user interacts — okay */ }
+}
+function playSuccess(){
+  try{
+    if(!audioCtx) audioCtx = new AudioCtx();
+    const now = audioCtx.currentTime;
+    const notes = [880, 1100, 1320];
+    notes.forEach((n,i)=>{
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type='sine';
+      o.frequency.value = n;
+      g.gain.setValueAtTime(0.0001, now + i*0.08);
+      g.gain.exponentialRampToValueAtTime(0.08, now + i*0.08 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i*0.08 + 0.21);
+      o.start(now + i*0.08);
+      o.stop(now + i*0.08 + 0.25);
+    });
+  }catch(e){}
+}
+function playScale(){
+  try{
+    if(!audioCtx) audioCtx = new AudioCtx();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='triangle';
+    o.frequency.value = 520;
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+    o.start();
+    o.stop(audioCtx.currentTime + 0.36);
+  }catch(e){}
+}
+
+/* tiny initial burst for welcome */
+setTimeout(()=> showTinyHeartBurst(10), 400);
+
+/* auto save hint:
+   Live Server will auto-refresh if you save file (Ctrl+S). */
+
+/* keyboard navigation */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowRight') nextBtn.click();
+  if(e.key === 'ArrowLeft') prevBtn.click();
+});
+
+/* small accessibility: focus first answer when rendered */
+answersEl.addEventListener('DOMNodeInserted', ()=> {
+  const first = answersEl.querySelector('.option');
+  if(first) first.setAttribute('tabindex', '0');
+});
+
+/* ensure progress update when current changes */
+const origRender = renderQuestion;
+renderQuestion = function(){
+  origRender();
+  updateProgress();
+}
+
+/* init call again to apply override */
+init();
+</script>
+</body>
+</html>
